@@ -2,6 +2,7 @@ import nomad
 import boto3
 import _thread
 import json
+import time
 from flask import Flask
 from concurrent.futures import ThreadPoolExecutor
 
@@ -27,6 +28,12 @@ def deploy_task(message):
 
         try:
             print('Submitting job: %s' % task_name)
+            try:
+                n.job.deregister_job(task_name)
+                print('Stopped job: %s' % task_name)
+            except Exception:
+                print('Cannot stop job: %s, will continue anyway' % task_name)
+            time.sleep(1)
             n.job.register_job(task_name, task_json)
             print('Submitted job: %s' % task_name)
 
